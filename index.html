@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DABY LEGO‑CHAIN METHOD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --neon-cyan: #00f5ff;
+            --neon-yellow: #ffe25f;
+            --neon-green: #4dff9b;
+            --neon-magenta: #ff2f92;
+            --bg-dark: #02030b;
+            --card-dark: rgba(10, 10, 30, 0.9);
+            --border-glow: rgba(78, 228, 231, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 50%, rgba(10, 10, 30, 0.8) 0%, rgba(2, 3, 11, 1) 70%);
+            background-attachment: fixed;
+            color: #b0b0b0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .starfield {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        .star:nth-child(1) { top: 10%; left: 20%; width: 2px; height: 2px; animation: twinkle 5s infinite; }
+        .star:nth-child(2) { top: 50%; left: 70%; width: 3px; height: 3px; animation: twinkle 7s infinite 1s; }
+        .star:nth-child(3) { top: 80%; left: 40%; width: 2px; height: 2px; animation: twinkle 6s infinite 2s; }
+        .star:nth-child(4) { top: 30%; left: 90%; width: 4px; height: 4px; animation: twinkle 8s infinite 0.5s; }
+        .star:nth-child(5) { top: 60%; left: 10%; width: 2px; height: 2px; animation: twinkle 4s infinite 3s; }
+        .star:nth-child(6) { top: 20%; left: 50%; width: 3px; height: 3px; animation: twinkle 6.5s infinite 1.5s; }
+        .star:nth-child(7) { top: 90%; left: 15%; width: 2px; height: 2px; animation: twinkle 5.5s infinite 2.5s; }
+        .star:nth-child(8) { top: 40%; left: 80%; width: 3px; height: 3px; animation: twinkle 7.5s infinite; }
+        .star:nth-child(9) { top: 70%; left: 30%; width: 4px; height: 4px; animation: twinkle 8.5s infinite 1s; }
+        .star:nth-child(10) { top: 5%; left: 60%; width: 2px; height: 2px; animation: twinkle 4.5s infinite 3.5s; }
+
+        .container {
+            background: linear-gradient(135deg, rgba(10, 10, 30, 0.9) 0%, rgba(20, 20, 50, 0.9) 100%);
+            border-radius: 22px;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1100px;
+            overflow: hidden;
+        }
+
+        .header-bar {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow), var(--neon-green));
+            height: 8px;
+        }
+
+        .header {
+            background: rgba(25, 25, 60, 0.7);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 0;
+            background: rgba(25, 25, 60, 0.5);
+            border-bottom: 1px solid var(--border-glow);
+            padding: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            background: transparent;
+            color: #b0b0b0;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(78, 228, 231, 0.1);
+            color: var(--neon-cyan);
+        }
+
+        .tab-btn.active {
+            color: var(--neon-cyan);
+            border-bottom-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .content {
+            padding: 40px;
+            min-height: 600px;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .module {
+            margin-bottom: 40px;
+            padding: 24px;
+            background: rgba(25, 25, 60, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .module h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--neon-cyan);
+        }
+
+        .module h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+            color: var(--neon-yellow);
+        }
+
+        .module p {
+            line-height: 1.6;
+            margin-bottom: 16px;
+            color: #b0b0b0;
+        }
+
+        .example {
+            background: rgba(10, 10, 30, 0.6);
+            padding: 16px;
+            border-left: 4px solid var(--neon-green);
+            margin: 12px 0;
+            border-radius: 6px;
+        }
+
+        .en {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pt {
+            color: #b0b0b0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .speak-btn {
+            background: var(--neon-cyan);
+            border: none;
+            color: var(--bg-dark);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .speak-btn:hover {
+            background: var(--neon-yellow);
+            transform: scale(1.05);
+        }
+
+        .drop-zone {
+            background: rgba(10, 10, 30, 0.8);
+            border: 2px dashed var(--neon-cyan);
+            border-radius: 8px;
+            padding: 24px;
+            min-height: 80px;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-start;
+            align-content: flex-start;
+        }
+
+        .words-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 16px;
+            background: rgba(25, 25, 60, 0.3);
+            border-radius: 8px;
+        }
+
+        .word {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            color: var(--bg-dark);
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: grab;
+            font-weight: 600;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .word:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.4);
+        }
+
+        .word.placed {
+            background: linear-gradient(135deg, var(--neon-magenta), var(--neon-yellow));
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+        }
+
+        .btn-check:hover {
+            background: var(--neon-yellow);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.4);
+        }
+
+        .btn-next {
+            background: var(--neon-green);
+            color: var(--bg-dark);
+        }
+
+        .btn-next:hover {
+            background: var(--neon-magenta);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 47, 146, 0.4);
+        }
+
+        #feedback {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            min-height: 24px;
+        }
+
+        .feedback.correct {
+            background: rgba(77, 255, 155, 0.2);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .feedback.incorrect {
+            background: rgba(255, 69, 0, 0.2);
+            color: #ff4500;
+            border: 1px solid #ff4500;
+        }
+
+        .footer {
+            background: rgba(25, 25, 60, 0.7);
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-glow);
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+
+        .pro-tip {
+            background: rgba(138, 43, 226, 0.2);
+            border-left: 4px solid var(--neon-magenta);
+            padding: 16px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .pro-tip strong {
+            color: var(--neon-magenta);
+        }
+    </style>
+</head>
+<body>
+    <div class="starfield">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+
+    <div class="container">
+        <div class="header-bar"></div>
+        <div class="header">
+            <h1>DABY LEGO‑CHAIN METHOD</h1>
+        </div>
+
+        <div class="tabs-nav" id="tabs-nav"></div>
+
+        <div class="content" id="content"></div>
+
+        <div class="footer">
+            ✨ Master English expressions one LEGO block at a time ✨
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        const data = {
+            report: {
+                title: "Report To",
+                sections: [
+                    {
+                        heading: "📋 What is 'Report To'?",
+                        content: "Use 'report to' to describe your professional chain of command. This is how you communicate who your direct supervisor is.",
+                        examples: [
+                            { en: "I report to Maria.", pt: "Eu me reporto à Maria." },
+                            { en: "She reports to the CEO.", pt: "Ela se reporta ao CEO." },
+                            { en: "Who do you report to?", pt: "Para quem você se reporta?" }
+                        ]
+                    },
+                    {
+                        heading: "🎯 Why Use 'Report To'?",
+                        content: "Clarifies organizational structure, shows professional accountability, and is essential in workplace conversations.",
+                        examples: [
+                            { en: "In job interviews: 'I report to the department head.'", pt: "Em entrevistas: 'Eu me reporto ao chefe do departamento.'" },
+                            { en: "In meetings: 'Who do you report to?'", pt: "Em reuniões: 'Para quem você se reporta?'" },
+                            { en: "Team introductions: 'I report to Maria.'", pt: "Apresentações: 'Eu me reporto à Maria.'" }
+                        ]
+                    }
+                ],
+                practice: [
+                    { emoji: "👔", sentence: "I report to the manager", words: ["I", "report", "to", "the", "manager"] },
+                    { emoji: "🏢", sentence: "She reports to the CEO", words: ["She", "reports", "to", "the", "CEO"] },
+                    { emoji: "📊", sentence: "They report to the director", words: ["They", "report", "to", "the", "director"] },
+                    { emoji: "👥", sentence: "We report to Maria", words: ["We", "report", "to", "Maria"] },
+                    { emoji: "💼", sentence: "He reports to the team lead", words: ["He", "reports", "to", "the", "team", "lead"] },
+                    { emoji: "🎯", sentence: "You report to the supervisor", words: ["You", "report", "to", "the", "supervisor"] }
+                ]
+            },
+            work: {
+                title: "Work On",
+                sections: [
+                    {
+                        heading: "🔧 What is 'Work On'?",
+                        content: "Use 'work on' to describe what project, task, or skill you are currently developing or improving.",
+                        examples: [
+                            { en: "I work on software development.", pt: "Eu trabalho em desenvolvimento de software." },
+                            { en: "She works on marketing strategies.", pt: "Ela trabalha em estratégias de marketing." },
+                            { en: "What are you working on?", pt: "Em que você está trabalhando?" }
+                        ]
+                    },
+                    {
+                        heading: "💡 Why Use 'Work On'?",
+                        content: "Shows your current responsibilities, demonstrates active engagement, and is crucial in professional updates.",
+                        examples: [
+                            { en: "In status meetings: 'I'm working on the Q4 report.'", pt: "Em reuniões: 'Estou trabalhando no relatório Q4.'" },
+                            { en: "In conversations: 'What are you working on?'", pt: "Em conversas: 'Em que você está trabalhando?'" },
+                            { en: "In emails: 'I work on customer relations.'", pt: "Em emails: 'Eu trabalho em relações com clientes.'" }
+                        ]
+                    }
+                ],
+                practice: [
+                    { emoji: "💻", sentence: "I work on a new project", words: ["I", "work", "on", "a", "new", "project"] },
+                    { emoji: "📈", sentence: "She works on sales growth", words: ["She", "works", "on", "sales", "growth"] },
+                    { emoji: "🎨", sentence: "They work on design improvements", words: ["They", "work", "on", "design", "improvements"] },
+                    { emoji: "📱", sentence: "We work on mobile applications", words: ["We", "work", "on", "mobile", "applications"] },
+                    { emoji: "🔐", sentence: "He works on security features", words: ["He", "works", "on", "security", "features"] },
+                    { emoji: "🌐", sentence: "You work on international expansion", words: ["You", "work", "on", "international", "expansion"] }
+                ]
+            }
+        };
+
+        let activeTab = 'report';
+        let currentPractice = 0;
+        let userWords = [];
+        let draggedWord = null;
+
+        function renderTabs() {
+            const tabsNav = document.getElementById('tabs-nav');
+            tabsNav.innerHTML = `
+                <button class="tab-btn ${activeTab === 'report' ? 'active' : ''}" onclick="switchTab('report')">📋 Report</button>
+                <button class="tab-btn ${activeTab === 'work' ? 'active' : ''}" onclick="switchTab('work')">🔧 Work</button>
+            `;
+        }
+
+        function renderContent() {
+            const tab = data[activeTab];
+            let html = `<h2>${tab.title}</h2>`;
+
+            // Render sections
+            tab.sections.forEach(section => {
+                html += `<h3>${section.heading}</h3>`;
+                html += `<p>${section.content}</p>`;
+                section.examples.forEach(ex => {
+                    html += `
+                        <div class="example">
+                            <div class="en">${ex.en} <button class="speak-btn" onclick="speakText('${ex.en.replace(/'/g, "\\'")}')">${icons.volume}</button></div>
+                            <div class="pt">${ex.pt}</div>
+                        </div>
+                    `;
+                });
+            });
+
+            // Practice section
+            const practice = tab.practice[currentPractice];
+            const shuffled = [...practice.words].sort(() => Math.random() - 0.5);
+
+            html += `
+                <div class="module">
+                    <h2>Practice: Sentence ${currentPractice + 1} of ${tab.practice.length} ${practice.emoji}</h2>
+                    <p style="margin-bottom: 20px;"><strong>Target:</strong> ${practice.sentence}</p>
+                    <p style="margin-bottom: 20px;">Drag words to the box below to form the correct sentence:</p>
+                    <div class="drop-zone" ondragover="event.preventDefault()" ondrop="dropWord(event)">
+                        ${userWords.length === 0 ? '<span style="color: #b0b0b0; opacity: 0.5;">Drop words here...</span>' : userWords.map((w, i) => `<span class="word placed" draggable="true" ondragstart="dragWord(event, '${w}')" ondblclick="removeWord('${w}')">${w}</span>`).join('')}
+                    </div>
+                    <div class="words-container">
+                        ${shuffled.filter(w => !userWords.includes(w)).map(w => `<span class="word" draggable="true" ondragstart="dragWord(event, '${w}')">${w}</span>`).join('')}
+                    </div>
+                    <div class="buttons">
+                        <button class="btn btn-check" onclick="checkAnswer()">✓ Check Answer</button>
+                        <button class="btn btn-next" onclick="nextPractice()">→ Next</button>
+                    </div>
+                    <div id="feedback"></div>
+                </div>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            currentPractice = 0;
+            userWords = [];
+            renderTabs();
+            renderContent();
+        }
+
+        function dragWord(e, word) {
+            draggedWord = word;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dropWord(e) {
+            e.preventDefault();
+            if (draggedWord && !userWords.includes(draggedWord)) {
+                userWords.push(draggedWord);
+                renderContent();
+            }
+        }
+
+        function removeWord(word) {
+            userWords = userWords.filter(w => w !== word);
+            renderContent();
+        }
+
+        function checkAnswer() {
+            const practice = data[activeTab].practice[currentPractice];
+            const correct = JSON.stringify(userWords) === JSON.stringify(practice.words);
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = correct ? '<div class="feedback correct">✅ Correct! Great job!</div>' : '<div class="feedback incorrect">❌ Try again! Check the word order.</div>';
+        }
+
+        function nextPractice() {
+            const max = data[activeTab].practice.length;
+            if (currentPractice < max - 1) {
+                currentPractice++;
+                userWords = [];
+                renderContent();
+            } else {
+                alert('🎉 You completed all practice sentences for this tab!');
+                currentPractice = 0;
+                userWords = [];
+                renderContent();
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        const icons = {
+            volume: "🔊"
+        };
+
+        // Initial render
+        renderTabs();
+        renderContent();
+    </script>
+</body>
+</html>
